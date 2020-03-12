@@ -8,7 +8,7 @@ public class Spikes : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
-            collision.GetComponent<Player>().Hit(-0.1f);
+            collision.GetComponent<Player>().TakeDamage(-0.1f);
         }
     }
 

@@ -24,16 +24,12 @@ public class RunScript : MonoBehaviour
     {
         if (Time.timeScale == 1)
         {
-            if (onStairs)
-            {
-                Debug.Log("Up/Down");
-                player.Stairs(StraitsPlatform);
-            }
+
             if (Input.GetKeyDown(KeyCode.Space))
                 player.Jump();
             if (Input.GetKeyDown(KeyCode.F))
                 player.Attack();
-            player.Move();
+            
             player.Damage();
             player.Health();
         }
@@ -42,8 +38,6 @@ public class RunScript : MonoBehaviour
 
     private void FixedUpdate()
     {
-        player.Damage();
+        player.Move();
     }
-
-
 }
