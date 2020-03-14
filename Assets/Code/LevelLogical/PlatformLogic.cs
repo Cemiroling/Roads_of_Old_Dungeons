@@ -12,10 +12,10 @@ public class PlatformLogic : MonoBehaviour
 
     private void Start()
     {
-        triggerZone.gameObject.GetComponent<BoxCollider2D>().size = new Vector2(platform.gameObject.GetComponent<BoxCollider2D>().size.x + 2,
-            platform.gameObject.GetComponent<BoxCollider2D>().size.y + 2);
-        triggerZone.gameObject.GetComponent<Transform>().transform.position = new Vector2(platform.transform.position.x,
-            platform.transform.position.y - 1);
+      /*  triggerZone.gameObject.GetComponent<BoxCollider2D>().size = new Vector2(platform.gameObject.GetComponent<TilemapRenderer>().chunkSize.x + 2,
+            platform.gameObject.GetComponent<TilemapRenderer>().chunkSize.y + 2);*/
+      /*  triggerZone.gameObject.GetComponent<Transform>().transform.position = new Vector2(platform.transform.position.x,
+            platform.transform.position.y - 1);*/
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

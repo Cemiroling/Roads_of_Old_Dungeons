@@ -10,6 +10,9 @@ public class EndLenel : MonoBehaviour
         if (collision.CompareTag("Player"))
         {
             SceneManager.LoadScene("LoadScene");
+            //SceneManager.UnloadScene(SceneManager.GetActiveScene().name);
         }
     }
 }
+
+

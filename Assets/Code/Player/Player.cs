@@ -1,33 +1,44 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.UI;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IAlive
 {
-
-    public float WalkSpeed = 3;
-    public float JumpForce = 10;
-    [SerializeField] int speedUp;
-    private bool isFacingRight = true;
-    [SerializeField] public ItemScene itemScene;
-    public Transform groundCheck;
-    [SerializeField] Text text;
-    
-    [SerializeField] EquipmentManager equipmentManager;
-
-    private float groundRadius = 0.3f;
-    public LayerMask enemy;
     private Transform _transform;
     private Rigidbody2D _rigidbody;
     private Animator _animatorController;
-    [SerializeField] private Transform sword;
+    private bool isFacingRight = true;
+    private bool doubleJump = false;
+    private bool isBlockMove = false;
 
-    [SerializeField] private HealthBar healthBar;
+
+    [Header("Передвижения игрока")]
+    public float walkSpeed = 3;
+    public float jumpForce = 10;
+    public float speedUp;
+    public float hOfPlayer;
+
+    [Header("Bars")]
+    public HealthBar healthBar;
+
+    [Header("Маски")]
+    public LayerMask enemy;
+    public LayerMask ground;
+    public string groundTag;
+
+
+
+    [SerializeField] public ItemScene itemScene;
+    [SerializeField] Text text;  
+    [SerializeField] EquipmentManager equipmentManager;
+
+    public bool IsBlockMove { set => isBlockMove = value; }
 
     public void Move()
     {
         float move = Input.GetAxisRaw("Horizontal");
-        _animatorController.SetFloat("Speed", Mathf.Abs(move));
-       _rigidbody.velocity = new Vector2(move * WalkSpeed, _rigidbody.velocity.y);
+        _rigidbody.velocity = new Vector2(move * walkSpeed, _rigidbody.velocity.y);
+        _animatorController.SetFloat("Speed", Mathf.Abs(move));     
         if (move > 0 && !isFacingRight)
             Flip();
         else if (move < 0 && isFacingRight)
@@ -39,6 +50,8 @@ public class Player : MonoBehaviour
         _rigidbody = GetComponent<Rigidbody2D>();
         _animatorController = GetComponent<Animator>();
     }
+
+    
     private void Flip()
     {
         
@@ -52,31 +65,34 @@ public class Player : MonoBehaviour
         
     }
 
-    public void Stairs( StraitsPlatform straitsPlatform)
+    public bool isGround()
     {
-
-        float vertical = Input.GetAxis("Vertical");
-        _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, vertical * speedUp * Time.fixedDeltaTime * 10);
-        _rigidbody.bodyType = RigidbodyType2D.Kinematic;
+        RaycastHit2D raycastHit2D = Physics2D.Raycast(transform.position, Vector2.down, hOfPlayer, ground + enemy);
+        if (raycastHit2D)
+            return true;
+        else return false;
     }
 
-
-    private bool isGround()
+    private void OnDrawGizmos()
     {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(groundCheck.position,groundRadius);
-        int j = 0;
-        for (int i = 0; i < colliders.Length; i++)
-        {
-            if (colliders[i].gameObject.CompareTag("Ground"))
-                j++;
-        }     
-        return j > 0;
+        Gizmos.color = Color.green;
+        Gizmos.DrawRay(transform.position, new Vector2(0, -1*hOfPlayer));
+
+
     }
 
     public void Jump()
-    { 
-        if(isGround())
-            _rigidbody.AddForce(_transform.up * JumpForce, ForceMode2D.Impulse);      
+    {
+        if (isGround())
+        {
+            _rigidbody.AddForce(_transform.up * jumpForce, ForceMode2D.Impulse);
+            doubleJump = false;
+        }
+        else if(!doubleJump)
+        {
+            _rigidbody.AddForce(_transform.up * jumpForce, ForceMode2D.Impulse);
+            doubleJump = true;
+        }                 
     }
 
     public void ExitStraits()
@@ -94,36 +110,18 @@ public class Player : MonoBehaviour
         _animatorController.SetBool("Attack", false);
     }
 
-    public void Hit(float damage)
+    public void TakeDamage(float damage)
     {
-        CustomItemAndGo item = equipmentManager.getItem(GearMainType.Armor);
-        if (item == null)
-            healthBar.AdjustCurrentValue(damage);
-        else
-        {
-            healthBar.AdjustCurrentValue(damage/item.TheItem.mainStat.TheValue);
-        }
+        healthBar.AdjustCurrentValue(damage);
 
     }
     public void Damage()
     {
-        Collider2D[] collider = Physics2D.OverlapCircleAll(sword.position, 0.3f, enemy);
-
-        for (int i = 0; i < collider.Length; i++)
-        {
-            if (collider[i].CompareTag("Enemy"))
-            {
-                CustomItemAndGo item = equipmentManager.getItem(GearMainType.Weapon);
-                Enemy enemy = collider[i].GetComponent<Enemy>();
-                if (item == null)
-                   enemy.damageTake(-0.04f);               
-                else                              
-                   enemy.damageTake(-0.04f*item.TheItem.mainStat.TheValue);            
-            }
-
-        }
+       // RaycastHit2D raycastHit2D = Physics2D.Raycast(transform.position, Vector2.);
 
     }
+
+
 
     public void Health()
     {
@@ -138,27 +136,18 @@ public class Player : MonoBehaviour
         Destroy(gameObject);
     }
 
- /*   private void OnTriggerStay2D(Collider2D collision)
-    {
-        if (collision.CompareTag("Item"))
-        {
-            if (Input.GetAxis("Pick") == 1)
-            {
-                collision.GetComponent<ItemScenePresenter>().PickUp();
-            }
-
-        }
-    }*/
-
-    private void Update()
-    {
-        //string gold = ShopManager.TestScenePlayerGold.ToString();
-        //text.text = "Золото " + gold;
-    }
-
     private void CastOn()
     {
         _animatorController.SetBool("Cast", false);
     }
 
+
+    public void FallDown()
+    {
+        _rigidbody.AddForce(_transform.up * (-2), ForceMode2D.Impulse);
+        if (isFacingRight)
+            _rigidbody.velocity = new Vector2(-1*walkSpeed,  _rigidbody.velocity.y);
+        else _rigidbody.velocity = new Vector2(1* walkSpeed, _rigidbody.velocity.y);
+
+    }
 }
