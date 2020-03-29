@@ -10,7 +10,8 @@ public class Player : MonoBehaviour, IAlive
     private bool isFacingRight = true;
     private bool doubleJump = false;
     private bool isBlockMove = false;
-
+    private bool iAmAttacking = false;
+    private bool iDealDamage = false;
 
     [Header("Передвижения игрока")]
     public float walkSpeed = 3;
@@ -20,17 +21,22 @@ public class Player : MonoBehaviour, IAlive
 
     [Header("Bars")]
     public HealthBar healthBar;
+    public float healthPoint;
 
     [Header("Маски")]
     public LayerMask enemy;
     public LayerMask ground;
     public string groundTag;
 
+    [Header("Характеристики атаки")]
+    public float damage;
+    public float attackDistance = 1;
 
 
-    [SerializeField] public ItemScene itemScene;
+
+    [SerializeField] public ItemScenePresenter itemScene;
     [SerializeField] Text text;  
-    [SerializeField] EquipmentManager equipmentManager;
+   // [SerializeField] EquipmentManager equipmentManager;
 
     public bool IsBlockMove { set => isBlockMove = value; }
 
@@ -49,9 +55,16 @@ public class Player : MonoBehaviour, IAlive
         _transform = GetComponent<Transform>();
         _rigidbody = GetComponent<Rigidbody2D>();
         _animatorController = GetComponent<Animator>();
+        healthBar.MaxHealthPoint = healthPoint;
+        healthBar.currentValue = healthPoint;
     }
 
-    
+    private void Update()
+    {
+        if (iAmAttacking)
+            Damage();           
+    }
+
     private void Flip()
     {
         
@@ -67,7 +80,7 @@ public class Player : MonoBehaviour, IAlive
 
     public bool isGround()
     {
-        RaycastHit2D raycastHit2D = Physics2D.Raycast(transform.position, Vector2.down, hOfPlayer, ground + enemy);
+        RaycastHit2D raycastHit2D = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y - 2f), Vector2.down, hOfPlayer, ground + enemy);
         if (raycastHit2D)
             return true;
         else return false;
@@ -76,9 +89,10 @@ public class Player : MonoBehaviour, IAlive
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
-        Gizmos.DrawRay(transform.position, new Vector2(0, -1*hOfPlayer));
+        Gizmos.DrawRay(new Vector2(transform.position.x, transform.position.y-2f), new Vector2(0,-1*hOfPlayer));
 
-
+        Gizmos.color = Color.red;
+        Gizmos.DrawRay(new Vector2(transform.position.x,transform.position.y-1), new Vector2(transform.localScale.x * attackDistance, 0));
     }
 
     public void Jump()
@@ -102,22 +116,36 @@ public class Player : MonoBehaviour, IAlive
 
     public void Attack()
     {
-      _animatorController.SetBool("Attack", true);     
+      _animatorController.SetBool("Attack", true);
+       
+    }
+
+    public void AttackStart()
+    {
+        iAmAttacking = true;
     }
 
     public void noAttack()
     {
         _animatorController.SetBool("Attack", false);
+        iAmAttacking = false;
+        iDealDamage = false;
     }
 
     public void TakeDamage(float damage)
     {
-        healthBar.AdjustCurrentValue(damage);
+        healthBar.MinusCurrentValue(damage);
 
     }
     public void Damage()
     {
-       // RaycastHit2D raycastHit2D = Physics2D.Raycast(transform.position, Vector2.);
+       RaycastHit2D raycastHit2D = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y-1), new Vector2(transform.localScale.x*attackDistance,0), attackDistance, enemy);
+       Debug.DrawRay(new Vector2(transform.position.x, transform.position.y-1), new Vector2(transform.localScale.x*attackDistance,0));
+       if(raycastHit2D&&!iDealDamage)
+       {
+           raycastHit2D.collider.GetComponent<IAlive>().TakeDamage(damage);
+            iDealDamage = true;
+       }
 
     }
 

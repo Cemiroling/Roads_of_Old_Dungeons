@@ -5,10 +5,10 @@ using UnityEngine;
 public class Shop : MonoBehaviour
 {
    // [SerializeField] private GameObject Inventory;
-    [SerializeField] private ShopManager shopManager;
+    [SerializeField] private GameObject shopManager;
     public void Start()
     {
-        shopManager = GameObject.Find("ShopWindow").GetComponent<ShopManager>();        
+        //shopManager = GameObject.Find("ShopWindow").GetComponent<ShopManager>();        
         Invoke("Disable", 0.5f);
     }
 
