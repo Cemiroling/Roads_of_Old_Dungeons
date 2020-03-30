@@ -1,42 +1,47 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System;
 using UnityEngine.EventSystems;
 
-public class EquipmentSlot : MonoBehaviour/*, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler*/
+public class EquipmentSlot : UIItem, IPointerClickHandler/*, IPointerEnterHandler, IPointerExitHandler*/
 {
     public GearMainType gearMainType;
-    public UIItem uIItem;
-    private UIItem script;
+
+    public event Action SwapingItem;
+
+    public event Action UnSwapingItem;
      
 
-
-    private void Awake()
+    
+    
+    public new void OnPointerClick(PointerEventData eventData)
     {
-        script = uIItem.gameObject.GetComponent<UIItem>();
-    }
-/*    public void OnPointerClick(PointerEventData eventData)
-    {
-        if (uIItem.selectedItemName != null)
+        if (this.SelectedItem.item != null)
         {
-            if (gearMainType == uIItem.SelectedItem.item.gearMainType)
+            if (gearMainType == this.SelectedItem.item.gearMainType)
             {
-                uIItem.OnPointerClick(eventData);
+                UnSwapingItem?.Invoke();
+                Swap();
+                SwapingItem?.Invoke();
             }
+        }
+        else
+        {
+            UnSwapingItem?.Invoke();
+            Swap();
+            SwapingItem?.Invoke();
         }
     }
 
-    public void OnPointerEnter(PointerEventData eventData)
+/*    public void OnPointerEnter(PointerEventData eventData)
     {
-        if(uIItem.SelectedItem.item.gearMainType != this.gearMainType)
+        if(this.SelectedItem.item.gearMainType != this.gearMainType)
         {
-            script.gameObject.SetActive(false);
+            this.gameObject.SetActive(false);
         }
     }  
     
     public void OnPointerExit(PointerEventData eventData)
     {
-        script.gameObject.SetActive(false);
+        this.gameObject.SetActive(false);
     }*/
     
     

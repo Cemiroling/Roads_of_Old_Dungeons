@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -21,15 +22,15 @@ public class TooltipForInventory : MonoBehaviour, IPointerUpHandler, IPointerEnt
     public void GenerateToolTip(Item item)
     {
         string statText = "";
-        /*if (item.stats.Count > 0)
+        if (item.atributes.Count > 0)
         {
-            foreach(var stat in item.stats)
+            foreach(var stat in item.atributes)
             {
-                statText += stat.Key.ToString() + ": " + stat.Value.ToString() + "\n";
+                statText += Enum.GetName(typeof(TypeOfAtribute),stat.atribute) + ": " + stat.value.ToString() + "\n";
             }
-        }*/
-        string tooltip = string.Format("<b>{0}</b>\n{1}\n\n<b>{2}</b>",
-            item.title, item.description, statText);
+        }
+        string tooltip = string.Format("<b>{0}</b>\n{1}\n\n<b>{2}</b>\n<b>{3}</b>",
+            item.title, item.description, statText,Enum.GetName(typeof(Rarity), item.rarity));
         tooltipText.text = tooltip;
         gameObject.SetActive(true);
     }

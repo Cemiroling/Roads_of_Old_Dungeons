@@ -41,6 +41,7 @@ GameObject:
   - component: {fileID: 3664331206200110078}
   - component: {fileID: 3664331206200110077}
   - component: {fileID: 3664331206200110076}
+  - component: {fileID: 176660308}
   - component: {fileID: 3664331206200110075}
   - component: {fileID: 3664331206200110018}
   - component: {fileID: 3664331206200110017}
@@ -87,7 +88,6 @@ MonoBehaviour:
   jumpForce: 5
   speedUp: 15
   hOfPlayer: 0.5
-  healthBar: {fileID: 0}
   enemy:
     serializedVersion: 2
     m_Bits: 1024
@@ -95,9 +95,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 512
   groundTag: Ground
+  damage: 100
+  attackDistance: 2.56
   itemScene: {fileID: 0}
   text: {fileID: 0}
-  equipmentManager: {fileID: 0}
 --- !u!114 &3664331206200110076
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -111,7 +112,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 3664331206200110077}
+  inventoryWindow: {fileID: 0}
   onStairs: 0
+--- !u!114 &176660308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3664331206200110074}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db7b4c98ea8a6af43bae823373e22615, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 3664331206200110077}
+  equipment: {fileID: 0}
+  hPRegen: 0
+  strengh: 10
+  agility: 10
+  intelligence: 10
+  healthBar: {fileID: 0}
+  healthPoint: 200
 --- !u!95 &3664331206200110075
 Animator:
   serializedVersion: 3

@@ -15,15 +15,15 @@ public class UIItem : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
 
     public Item item;
     public ItemScenePresenter itemScenePresenter;
-    private Image spriteImage;
-    private UIItem selectedItem;
-    private TooltipForInventory tooltip;
-    private Inventory inventory;
-    private MenuItem menuItem;
+    protected Image spriteImage;
+    protected UIItem selectedItem;
+    protected TooltipForInventory tooltip;
+    protected Inventory inventory;
+    protected MenuItem menuItem;
 
     public UIItem SelectedItem { get => selectedItem; }
 
-    private void Awake()
+    protected void Awake()
     {
         spriteImage = GetComponent<Image>();
         UpdateItem(null);
@@ -52,25 +52,7 @@ public class UIItem : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     {
         if (eventData.button == PointerEventData.InputButton.Left)
         {
-            if (this.item != null)
-            {
-                if (selectedItem.item != null)
-                {
-                    Item clone = new Item(selectedItem.item);
-                    selectedItem.UpdateItem(this.item);
-                    UpdateItem(clone);
-                }
-                else
-                {
-                    selectedItem.UpdateItem(this.item);
-                    UpdateItem(null);
-                }
-            }
-            else if (selectedItem.item != null)
-            {
-                UpdateItem(selectedItem.item);
-                selectedItem.UpdateItem(null);
-            }
+            Swap();
         }
         else if (eventData.button == PointerEventData.InputButton.Right && this.item != null && selectedItem.item == null)
         {
@@ -87,6 +69,32 @@ public class UIItem : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         inventory.RemoveItemByIndex(item);
         UpdateItem(null);
     }
+
+    protected void Swap()
+    {
+        if (this.item != null)
+        {
+            if (selectedItem.item != null)
+            {
+
+                Item clone = (Item) ScriptableObject.CreateInstance(typeof(Item));
+                clone.Clone(selectedItem.item);
+                selectedItem.UpdateItem(this.item);
+                UpdateItem(clone);
+            }
+            else
+            {
+                selectedItem.UpdateItem(this.item);
+                UpdateItem(null);
+            }
+        }
+        else if (selectedItem.item != null)
+        {
+            UpdateItem(selectedItem.item);
+            selectedItem.UpdateItem(null);
+        }
+    }
+
 
     public void OnPointerExit(PointerEventData eventData)
     {

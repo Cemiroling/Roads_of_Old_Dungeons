@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Player : MonoBehaviour, IAlive
+public class Player : MonoBehaviour
 {
     private Transform _transform;
     private Rigidbody2D _rigidbody;
@@ -19,9 +19,7 @@ public class Player : MonoBehaviour, IAlive
     public float speedUp;
     public float hOfPlayer;
 
-    [Header("Bars")]
-    public HealthBar healthBar;
-    public float healthPoint;
+    
 
     [Header("Маски")]
     public LayerMask enemy;
@@ -55,8 +53,7 @@ public class Player : MonoBehaviour, IAlive
         _transform = GetComponent<Transform>();
         _rigidbody = GetComponent<Rigidbody2D>();
         _animatorController = GetComponent<Animator>();
-        healthBar.MaxHealthPoint = healthPoint;
-        healthBar.currentValue = healthPoint;
+
     }
 
     private void Update()
@@ -132,11 +129,7 @@ public class Player : MonoBehaviour, IAlive
         iDealDamage = false;
     }
 
-    public void TakeDamage(float damage)
-    {
-        healthBar.MinusCurrentValue(damage);
-
-    }
+    
     public void Damage()
     {
        RaycastHit2D raycastHit2D = Physics2D.Raycast(new Vector2(transform.position.x, transform.position.y-1), new Vector2(transform.localScale.x*attackDistance,0), attackDistance, enemy);
@@ -151,12 +144,9 @@ public class Player : MonoBehaviour, IAlive
 
 
 
-    public void Health()
+    public void HealthLevelZero()
     {
-        if (healthBar.currentValue == 0)
-        {
-            _animatorController.SetBool("Death", true);
-        }
+         _animatorController.SetBool("Death", true);  
     }
 
     private void Death()

@@ -33,7 +33,6 @@ public class RunScript : MonoBehaviour
                 player.Attack();
             if (Input.GetKeyDown(KeyCode.I))
                 inventoryWindow.SetActive(!inventoryWindow.activeSelf);
-            player.Health();
         }
        
     }

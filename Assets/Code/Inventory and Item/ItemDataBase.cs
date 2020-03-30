@@ -26,7 +26,9 @@ public class ItemDataBase : MonoBehaviour
         Item[] itemBase = Resources.LoadAll<Item>("Items");
         foreach(Item elem in itemBase)
         {
+            elem.CrateStats();
             items.Add(elem);
+            
         }
     }
 }

@@ -13,6 +13,7 @@ public class Inventory : MonoBehaviour
     {
         GiveItem(0);
         GiveItem(1);
+        GiveItem(2);
     }
 
     private void Update()
@@ -26,7 +27,6 @@ public class Inventory : MonoBehaviour
         if (characterItems.Count < sizeOfInventory)
         {
             Item itemToAdd = ItemDataBase.GetItem(id);
-            itemToAdd.CrateStats();
             characterItems.Add(itemToAdd);
             inventoryUI.AddNewItem(itemToAdd);
             Debug.Log("Added item: " + itemToAdd.title);

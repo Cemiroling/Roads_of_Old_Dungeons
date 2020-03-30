@@ -46,12 +46,26 @@ public class Item : ScriptableObject
         this.itemType = item.itemType;
     }
 
+    public void Clone(Item item)
+    {
+        this.title = item.title;
+        this.id = item.id;
+        this.description = item.description;
+        this.icon = item.icon;
+        this.stats = item.stats;
 
+        this.rarity = item.rarity;
+        this.atributes = item.atributes;
+        this.gearMainType = item.gearMainType;
+        this.itemType = item.itemType;
+
+        this.atributes = item.atributes;
+    }
 
     public void CrateStats()
     {
         atributes = new List<AtributeOfItem>();
-        for(int i=0; i < listOfType.Count; i++)
+        for (int i = 0; i < listOfType.Count; i++)
         {
             atributes.Add(new AtributeOfItem(listOfType[i], listOfValue[i]));
         }
@@ -70,7 +84,7 @@ public enum Rarity
 
 public enum TypeOfAtribute
 {
-    Attack = 0, Magic = 1, Defence = 2
+    Attack = 0, Magic = 1, Defence = 2, CriticalDamage, CriticalChance,
 }
 
 public enum GearMainType

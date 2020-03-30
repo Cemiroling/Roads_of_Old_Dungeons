@@ -1,35 +1,61 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Equipment : MonoBehaviour
 {
-    public List<EquipmentSlot> uIItems = new List<EquipmentSlot>();
+    public List<EquipmentSlot> equipmentSlots = new List<EquipmentSlot>();
+
+    public event Action Equipmting;
+    public event Action UnEquipmting;
+
+    public EquipmentSlot EquipmentSlot { get; set; }
 
 
-
-
-    private UIItem CheckUIItem(Item item)
+    private EquipmentSlot CheckUIItem(Item item)
     {
-        return uIItems.Find(i => i.gearMainType == item.gearMainType).uIItem;
+        return equipmentSlots.Find(i => i.gearMainType == item.gearMainType);
     }
 
+    private void Start()
+    {
+        foreach (EquipmentSlot slot in equipmentSlots)
+        {
+            slot.SwapingItem += () => Swaping(slot);
+            slot.UnSwapingItem += () => UnSwaping(slot);
+        }
+    }
+
+    private void UnSwaping(EquipmentSlot equipmentSlot)
+    {
+        EquipmentSlot = equipmentSlot;
+        UnEquipmting?.Invoke();
+    }
+    private void Swaping(EquipmentSlot equipmentSlot)
+    {
+        EquipmentSlot = equipmentSlot;
+        Equipmting?.Invoke(); 
+    }
 
     public void EquipItem(UIItem equipItem)
     {
-        UIItem slot = CheckUIItem(equipItem.item);
+        EquipmentSlot slot = CheckUIItem(equipItem.item);
         Debug.Log("fdsf");
+
         if (slot.item == null)
         {
-            CheckUIItem(equipItem.item).UpdateItem(equipItem.item);
+            slot.UpdateItem(equipItem.item);
             equipItem.UpdateItem(null);
         }
         else
         {
-            Item clone = new Item(slot.item);
-            CheckUIItem(equipItem.item).UpdateItem(equipItem.item);
+            UnSwaping(slot);
+            Item clone =(Item) ScriptableObject.CreateInstance(typeof(Item));
+            clone.Clone(slot.item);
+            slot.UpdateItem(equipItem.item);
             equipItem.UpdateItem(clone);
         }
+        Swaping(slot);
     }
 
 
