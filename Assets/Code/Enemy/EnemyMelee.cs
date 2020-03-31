@@ -35,7 +35,9 @@ public class EnemyMelee : MonoBehaviour, IEnemy, IAlive
     public float searchRange;
     public LayerMask enemyLayer;
     [Header("Bars")]
+    public float healthPoint;
     public HealthBar healthBar;
+    public ItemScenePresenter itemScenePresenter;
     [Header("Урон")]
     public float damageOfEnemy;
     [Header("Задержка между атаками (сек)")]
@@ -55,7 +57,8 @@ public class EnemyMelee : MonoBehaviour, IEnemy, IAlive
 
     private void Start()
     {
-       
+        healthBar.MaxHealthPoint = healthPoint;
+        healthBar.currentValue = healthPoint;
         _transform = GetComponent<Transform>();
         _rigidbody = GetComponent<Rigidbody2D>();
         animatorController = GetComponent<Animator>();
@@ -75,11 +78,9 @@ public class EnemyMelee : MonoBehaviour, IEnemy, IAlive
             MeleeAttack();
             RangeAttack();
         }
-            
-       
-            
+        Health();
     }
-    private void Flip()
+   private void Flip()
 
     {
         Vector3 theScale = _transform.localScale;
@@ -103,9 +104,9 @@ public class EnemyMelee : MonoBehaviour, IEnemy, IAlive
 
     private void SearchPlayer()
     {
-        RaycastHit2D raycastHit2D = Physics2D.Raycast(transform.position, new Vector2(move * searchRange, 0), searchRange);
+        RaycastHit2D raycastHit2D = Physics2D.Raycast(transform.position, new Vector2(move * searchRange, 0), searchRange, enemyLayer);
         Debug.DrawRay(transform.position, new Vector2(move * searchRange, 0),Color.green);
-        if (raycastHit2D.GetType()==typeof(Player))
+        if (raycastHit2D)
         {
             if (!isFoundPlayer)
             {
@@ -131,20 +132,21 @@ public class EnemyMelee : MonoBehaviour, IEnemy, IAlive
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
-       // Gizmos.DrawWireSphere(transform.position, attackRangeMelee);
+        Gizmos.DrawWireSphere(transform.position, attackRangeMelee);
 
 
         Gizmos.color = Color.blue;
-       // Gizmos.DrawWireSphere(transform.position, searchRange);
+        Gizmos.DrawWireSphere(transform.position, searchRange);
 
         Gizmos.color = Color.black;
-       //Gizmos.DrawRay(transform.position, new Vector2(move, 0));
+        Gizmos.DrawRay(transform.position, new Vector2(move, 0));
 
         Gizmos.color = Color.yellow;
-        //Gizmos.DrawRay(transform.position, new Vector2(move * searchRange, 0));
+        Gizmos.DrawRay(transform.position, new Vector2(move * searchRange, 0));
 
         Gizmos.color = Color.red;
-        //Gizmos.DrawRay(new Vector2(transform.position.x + move * attackRangeStartRangeAttack, transform.position.y), new Vector2(move* attackRangeEndRangeAttack-attackRangeStartRangeAttack, 0));
+        Gizmos.DrawRay(new Vector2(transform.position.x + move * attackRangeStartRangeAttack, transform.position.y),
+            new Vector2(move* attackRangeEndRangeAttack-attackRangeStartRangeAttack, 0));
     }
 
 
@@ -158,7 +160,7 @@ public class EnemyMelee : MonoBehaviour, IEnemy, IAlive
        if (raycastHit2D&&!isDealDamage)
        {
           isDealDamage = true;   
-          raycastHit2D.collider.GetComponent<IAlive>().TakeDamage(-damageOfEnemy);
+          raycastHit2D.collider.GetComponent<IAlive>().TakeDamage(damageOfEnemy);
        }
  
     }
@@ -248,27 +250,38 @@ public class EnemyMelee : MonoBehaviour, IEnemy, IAlive
 
     public void TakeDamage(float damage)
     {
-        healthBar.AdjustCurrentValue(damage);
+        healthBar.MinusCurrentValue(damage);
         checkDamage();
+    }
+
+    IEnumerator SleepFlip()
+    {
+        yield return new WaitForSeconds(1f);
+
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, new Vector2(-move, 0), 4, enemyLayer);
+        if (hit)
+        {
+            Flip();
+        }
+
     }
     private void checkDamage()
     {
-        RaycastHit2D[] hit = Physics2D.RaycastAll(transform.position, new Vector2(move, 0), 4, enemyLayer);
-        if (hit.Length == 0)
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, new Vector2(-move, 0), 4, enemyLayer);
+        if (hit)
         {
-            Flip();
+            StartCoroutine(SleepFlip());
         }
     }
 
 
     private void Dead()
     {
-        List<Item> items = DatabaseManager.Items;
-        int i = Random.Range(0, DatabaseManager.Items.Count);
-        ItemScene itemScene = GameObject.Find("ItemScene").GetComponent<ItemScene>();
-        ItemScene item =Instantiate(itemScene, new Vector2(gameObject.transform.position.x, gameObject.transform.position.y),new Quaternion());
-        item.Present(DatabaseManager.Items[i]);
-        ShopManager.TestScenePlayerGold += 1000;
+        //List<Item> items = DatabaseManager.Items;
+      ////  int i = Random.Range(0, DatabaseManager.Items.Count);
+       // ItemScene item =Instantiate(itemScenePresenter, new Vector2(gameObject.transform.position.x, gameObject.transform.position.y),new Quaternion());
+     //   item.Present(DatabaseManager.Items[i]);
+        //ShopManager.TestScenePlayerGold += 1000;
         Destroy(gameObject);
     }
    

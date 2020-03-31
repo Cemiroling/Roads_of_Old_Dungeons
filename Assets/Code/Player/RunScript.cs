@@ -8,6 +8,8 @@ public class RunScript : MonoBehaviour
 
     public Player player;
 
+    public GameObject inventoryWindow;
+
     public bool onStairs = false;
 
     public StraitsPlatform StraitsPlatform { get; set; }
@@ -29,9 +31,8 @@ public class RunScript : MonoBehaviour
                 player.Jump();
             if (Input.GetKeyDown(KeyCode.F))
                 player.Attack();
-            
-            player.Damage();
-            player.Health();
+            if (Input.GetKeyDown(KeyCode.I))
+                inventoryWindow.SetActive(!inventoryWindow.activeSelf);
         }
        
     }

@@ -19,7 +19,7 @@ public class Bullet : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collider)
     {
-        if (collider.CompareTag(enemy)) collider.GetComponent<IAlive>().TakeDamage(-damage);
+        if (collider.CompareTag(enemy)) collider.GetComponent<IAlive>().TakeDamage(damage);
      
         if(!collider.CompareTag(creator)) Destroy(gameObject);
     }
